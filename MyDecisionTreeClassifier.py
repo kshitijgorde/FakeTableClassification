@@ -3,7 +3,8 @@ from sklearn.metrics import f1_score
 from sklearn.tree import DecisionTreeClassifier
 import numpy as np
 from sklearn.ensemble import AdaBoostClassifier,RandomForestClassifier
-
+import glob
+import pandas as pd
 
 import os
 import collections
@@ -39,6 +40,17 @@ class MyClassifiers():
         dir_name = os.path.dirname(os.path.realpath(__file__))
         #predictionResult = open(dir_name+'/'+technique+'DecisionTreeResultsNoOversampling.txt','a+')
         #predictionResult.truncate()
+        path = dir_name+'/LACityFake/*'
+
+        for dirName in glob.glob(path):
+            #fakeDf = pd.read_pickle(fname)
+            #print fakeDf[0]
+            fileName = dirName+'/scaled_fake_tabular.pickle'
+            print(fileName)
+            fakeDf = pd.read_pickle(fileName)
+            print(fakeDf)
+
+        exit(100)
         algorithms = ['DecisionTree','RandomForest','AdaBoost']
         # Create a dual for loop for everyalgorithm
         for eachAlgorithm in algorithms:
@@ -65,7 +77,7 @@ class MyClassifiers():
                     clf.fit(realTrainFeatures,realTrainLabels)
                     realResult = clf.predict(realTest_Features)
                     f1score = f1_score(realTest_Labels,realResult,average='macro')
-                    print "The f1_score is:" + str(f1score)
+                    print("The f1_score is:" + str(f1score))
 
             if eachAlgorithm == 'AdaBoost':
                 parameters_AdaBoost = {
@@ -86,7 +98,7 @@ class MyClassifiers():
                     clf.fit(realTrainFeatures,realTrainLabels)
                     realResult = clf.predict(realTest_Features)
                     f1score = f1_score(realTest_Labels,realResult,average='macro')
-                    print "The f1_score is:" + str(f1score)
+                    print("The f1_score is:" + str(f1score))
 
             if eachAlgorithm == 'RandomForest':
                 parameters_RandomForest = {
@@ -114,4 +126,4 @@ class MyClassifiers():
                     clf.fit(realTrainFeatures,realTrainLabels)
                     realResult = clf.predict(realTest_Features)
                     f1score = f1_score(realTest_Labels,realResult,average='macro')
-                    print "The f1_score is:" + str(f1score)
+                    print("The f1_score is:" + str(f1score))

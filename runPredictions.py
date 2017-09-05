@@ -12,33 +12,36 @@ df_labels = pd.read_pickle('LACityRealData/train_LACity_labels.pickle')
 test_df = pd.read_pickle('LACityRealData/test_LACity_cleaned.pickle')
 test_df_labels = pd.read_pickle('LACityRealData/test_LACity_labels.pickle')
 
-print df.columns
-del df[unicode('Total Payments')]
-del test_df[unicode('Total Payments')]
-del df[unicode('Payments Over Base Pay')]
-del test_df[unicode('Payments Over Base Pay')]
-del df[unicode('Base Pay')]
-del test_df[unicode('Base Pay')]
+print('Before Dropping:')
+print(len(df.columns))
+
+df.drop('Total Payments',axis = 1,inplace=True)
+#del df[unicode('Total Payments')]
+test_df.drop('Total Payments',axis = 1,inplace=True)
+#del test_df[unicode('Total Payments')]
+
+df.drop('Payments Over Base Pay',axis = 1,inplace=True)
+#del df[unicode('Payments Over Base Pay')]
+
+test_df.drop('Payments Over Base Pay',axis = 1,inplace=True)
+#del test_df[unicode('Payments Over Base Pay')]
+
+df.drop('Base Pay',axis = 1,inplace=True)
+test_df.drop('Base Pay',axis = 1,inplace=True)
+#del df[unicode('Base Pay')]
+#del test_df[unicode('Base Pay')]
 #test_df.drop(unicode('Total Payments'))
-print len(df.columns)
+print('After dropping')
+print(len(df.columns))
 # Test - 3750
 # Train - 15000
 clf = MyClassifiers()
-print len(df)
-print len(df_labels)
-print len(test_df)
-print len(test_df_labels)
+print(len(df))
+print(len(df_labels))
+print(len(test_df))
+print(len(test_df_labels))
 df = pd.np.array(df)
 df_labels = pd.np.array(df_labels)
 test_df = pd.np.array(test_df)
 test_df_labels = pd.np.array(test_df_labels)
 clf.classify(df,df_labels,test_df,test_df_labels)
-#
-# counter=0
-# for item in test_df:
-#     counter+=1
-#     print counter
-#     for item2 in df:
-#         if np.sum(item - item2)==0:
-#             print item,item2
-#
