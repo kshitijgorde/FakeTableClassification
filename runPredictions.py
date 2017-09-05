@@ -13,7 +13,67 @@ test_df = pd.read_pickle('LACityRealData/test_LACity_cleaned.pickle')
 test_df_labels = pd.read_pickle('LACityRealData/test_LACity_labels.pickle')
 
 print('Before Dropping:')
-print(len(df.columns))
+print(df.columns)
+
+
+# df.drop('Year',axis=1,inplace=True)
+# test_df.drop('Year',axis=1,inplace=True)
+
+df.drop('Permanent Bonus Pay',axis=1,inplace=True)
+test_df.drop('Permanent Bonus Pay',axis=1,inplace=True)
+
+df.drop('Other Pay (Payroll Explorer)',axis=1,inplace=True)
+test_df.drop('Other Pay (Payroll Explorer)',axis=1,inplace=True)
+
+# df.drop('Average Benefit Cost',axis=1,inplace=True)
+# test_df.drop('Average Benefit Cost',axis=1,inplace=True)
+
+# df.drop('Average Basic Life',axis=1,inplace=True)
+# test_df.drop('Average Basic Life',axis=1,inplace=True)
+
+
+# df.drop('Job Class',axis=1,inplace=True)
+# test_df.drop('Job Class',axis=1,inplace=True)
+
+# df.drop('FMS Department',axis=1,inplace=True)
+# test_df.drop('FMS Department',axis=1,inplace=True)
+
+# df.drop('Other Pay & Adjustments',axis=1,inplace=True)
+# test_df.drop('Other Pay & Adjustments',axis=1,inplace=True)
+
+# df.drop('Overtime Pay',axis=1,inplace=True)
+# test_df.drop('Overtime Pay',axis=1,inplace=True)
+
+# df.drop('Lump Sum Pay',axis=1,inplace=True)
+# test_df.drop('Lump Sum Pay',axis=1,inplace=True)
+
+df.drop('Temporary Bonus Pay',axis=1,inplace=True)
+test_df.drop('Temporary Bonus Pay',axis=1,inplace=True)
+
+# df.drop('Longevity Bonus Pay',axis=1,inplace=True)
+# test_df.drop('Longevity Bonus Pay',axis=1,inplace=True)
+
+df.drop('% Over Base Pay',axis=1,inplace=True)
+test_df.drop('% Over Base Pay',axis=1,inplace=True)
+
+df.drop('Q4 Payments',axis=1,inplace=True)
+test_df.drop('Q4 Payments',axis=1,inplace=True)
+
+df.drop('Q3 Payments',axis=1,inplace=True)
+test_df.drop('Q3 Payments',axis=1,inplace=True)
+
+df.drop('Q2 Payments',axis=1,inplace=True)
+test_df.drop('Q2 Payments',axis=1,inplace=True)
+
+df.drop('Q1 Payments',axis=1,inplace=True)
+test_df.drop('Q1 Payments',axis=1,inplace=True)
+
+df.drop('Projected Annual Salary',axis=1,inplace=True)
+test_df.drop('Projected Annual Salary',axis=1,inplace=True)
+
+
+
+#-----------------
 
 df.drop('Total Payments',axis = 1,inplace=True)
 #del df[unicode('Total Payments')]
@@ -33,6 +93,10 @@ test_df.drop('Base Pay',axis = 1,inplace=True)
 #test_df.drop(unicode('Total Payments'))
 print('After dropping')
 print(len(df.columns))
+
+
+
+
 # Test - 3750
 # Train - 15000
 clf = MyClassifiers()
