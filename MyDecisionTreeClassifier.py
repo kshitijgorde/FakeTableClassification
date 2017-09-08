@@ -5,9 +5,11 @@ import numpy as np
 from sklearn.ensemble import AdaBoostClassifier,RandomForestClassifier
 import glob
 import pandas as pd
-
+from sklearn.linear_model import LogisticRegression
 import os
+from sklearn.utils import shuffle
 import collections
+from sklearn.neural_network import MLPClassifier
 from collections import OrderedDict
 import matplotlib.pyplot as plt
 def formatString(stringTemplate, *args, **kwargs):
@@ -41,23 +43,48 @@ class MyClassifiers():
         dir_name = os.path.dirname(os.path.realpath(__file__))
         #predictionResult = open(dir_name+'/'+technique+'DecisionTreeResultsNoOversampling.txt','a+')
         #predictionResult.truncate()
-        path = dir_name+'/LACityFake/*'
+        path = dir_name+'/ARX/LACity/*'
         plt.grid(True)
-        figCount = 0
+        figCount = 20
         for dirName in glob.glob(path):
             plt.clf()
-            fileName = dirName + '/scaled_fake_tabular.pickle'
-            print(fileName)
-            fakeDf = pd.read_pickle(fileName)
+            #fileName = dirName + '/scaled_fake_tabular.pickle'
+            print(dirName)
+            fakeDf = pd.read_pickle(dirName)
+            print(fakeDf.columns)
             #Generate labels.....
             labels = []
-
             for i in range(len(fakeDf)):
-                if fakeDf[i][8] > 77636.3656547:
+                if fakeDf['Total Payments'][i] > 77636.3656547:
                     labels.append(1)  # rich
                 else:
                     labels.append(0)  # poor
-            algorithms = ['DecisionTree','RandomForest','AdaBoost']
+
+            algorithms = ['DecisionTree','RandomForest','AdaBoost','MLPClassifier']
+            fakeDf.drop('Permanent Bonus Pay', axis=1, inplace=True)
+
+            fakeDf.drop('Other Pay (Payroll Explorer)', axis=1, inplace=True)
+
+            fakeDf.drop('Temporary Bonus Pay', axis=1, inplace=True)
+
+            fakeDf.drop('% Over Base Pay', axis=1, inplace=True)
+
+            fakeDf.drop('Q4 Payments', axis=1, inplace=True)
+
+            fakeDf.drop('Q3 Payments', axis=1, inplace=True)
+
+            fakeDf.drop('Q2 Payments', axis=1, inplace=True)
+
+            fakeDf.drop('Q1 Payments', axis=1, inplace=True)
+
+            fakeDf.drop('Projected Annual Salary', axis=1, inplace=True)
+
+            fakeDf.drop('Total Payments', axis=1, inplace=True)
+
+            fakeDf.drop('Payments Over Base Pay', axis=1, inplace=True)
+
+            fakeDf.drop('Base Pay', axis=1, inplace=True)
+
             # Create a dual for loop for everyalgorithm
             for eachAlgorithm in algorithms:
                 if eachAlgorithm == 'DecisionTree':
@@ -87,13 +114,16 @@ class MyClassifiers():
 
                         # Process Every Fake file....training on Fake and testing on Real
                         #Index to generate labels is Total Payments @index 8
-                        fakeDfUpdated = np.delete(fakeDf, [0,1,2,3,4,5,6,7,8,9,11,15], axis=1)
-                        clf.fit(fakeDfUpdated,labels)
+                        #fakeDfUpdated = np.delete(fakeDf, [0,1,2,3,4,5,6,7,8,9,11,15], axis=1)
+                        # ----------------
+                        #-----------------
+
+                        clf.fit(fakeDf,labels)
                         fakeResults = clf.predict(realTest_Features)
                         fakeF1 = f1_score(realTest_Labels,fakeResults,average='macro')
                         print('Fake Results F1-measure is: '+str(fakeF1))
                         # prepare real values...replicate
-                        plt.title(fileName[57:65])
+                        plt.title(dirName[57:73])
                         plt.plot([0, 1], [0, 1])
                         dt = plt.plot(f1score,fakeF1,'ro',label='Decision Tree')
                         plt.grid(True)
@@ -124,7 +154,7 @@ class MyClassifiers():
                         realResult = clf.predict(realTest_Features)
                         f1score = f1_score(realTest_Labels,realResult,average='macro')
                         print("The f1_score is:" + str(f1score))
-                        clf.fit(fakeDfUpdated, labels)
+                        clf.fit(fakeDf, labels)
                         fakeResults = clf.predict(realTest_Features)
                         fakeF1 = f1_score(realTest_Labels, fakeResults, average='macro')
                         print('Fake Results F1-measure is: ' + str(fakeF1))
@@ -167,7 +197,7 @@ class MyClassifiers():
                         f1score = f1_score(realTest_Labels,realResult,average='macro')
                         print("The f1_score is:" + str(f1score))
                         #fakeDfUpdated = np.delete(fakeDf, [6, 8, 9], axis=1)
-                        clf.fit(fakeDfUpdated, labels)
+                        clf.fit(fakeDf, labels)
                         fakeResults = clf.predict(realTest_Features)
                         fakeF1 = f1_score(realTest_Labels, fakeResults, average='macro')
                         print('Fake Results F1-measure is: ' + str(fakeF1))
@@ -177,8 +207,55 @@ class MyClassifiers():
                         plt.grid(True)
                         plt.xticks([0,0.10, 0.20,0.30, 0.40,0.50, 0.60, 0.70, 0.80, 0.90, 1.0])
                         plt.yticks([0,0.10, 0.20,0.30, 0.40,0.50, 0.60, 0.70, 0.80, 0.90, 1.0])
-            handles, labels = plt.gca().get_legend_handles_labels()
-            by_label = OrderedDict(zip(labels, handles))
+
+                if eachAlgorithm == 'MLPClassifier':
+                    parameters_MLP = {
+                        0: "activation=relu, solver=adam, learning_rate=constant,max_iter=200",
+                        1: "activation=identity, solver=lbfgs, learning_rate=invscaling,max_iter=300",
+                        2: "activation=logistic, solver=sgd, learning_rate=adaptive,max_iter=250",
+                        3: "activation=tanh, solver=adam, learning_rate=constant,max_iter=320",
+                        4: "activation=relu, solver=lbfgs, learning_rate=constant,max_iter=270"
+                    }
+                    for i in range(0, 5):
+                        f1score = 0
+                        fakeF1 = 0
+                        parameter = list(parameters_MLP.values())[i]
+                        param = parameter.split(',')
+                        MLP_activation = param[0].split('=')[1]
+                        MLP_solver = param[1].split('=')[1]
+                        MLP_learningRate = param[2].split('=')[1]
+                        MLP_max_iter = int(param[3].split('=')[1])
+
+                        # Every i represents one parameter setup..Define the parameters
+                        clf = MLPClassifier(activation=MLP_activation,solver=MLP_solver,learning_rate=MLP_learningRate,
+                                            max_iter=MLP_max_iter)
+                        clf.fit(realTrainFeatures, realTrainLabels)
+                        print('PRINTING REAL...')
+                        print(list(realTrainLabels).count(0.0))
+                        print(list(realTrainLabels).count(1.0))
+
+                        realResult = clf.predict(realTest_Features)
+                        f1score = f1_score(realTest_Labels, realResult, average='macro')
+                        print("The f1_score is:" + str(f1score))
+                        # fakeDfUpdated = np.delete(fakeDf, [6, 8, 9], axis=1)
+                        print('PRINTING FROM FAKE')
+                        print(labels.count(0.0))
+                        print(labels.count(1.0))
+                        clf.fit(fakeDf, labels)
+                        fakeResults = clf.predict(realTest_Features)
+                        fakeF1 = f1_score(realTest_Labels, fakeResults, average='macro')
+                        print('Fake Results F1-measure is: ' + str(fakeF1))
+                        # prepare real values...replicate
+                        plt.plot([0, 1], [0, 1])
+                        lr = plt.plot(f1score, fakeF1, 'co', label='MLP Classifier')
+                        plt.grid(True)
+                        plt.xticks([0, 0.10, 0.20, 0.30, 0.40, 0.50, 0.60, 0.70, 0.80, 0.90, 1.0])
+                        plt.yticks([0, 0.10, 0.20, 0.30, 0.40, 0.50, 0.60, 0.70, 0.80, 0.90, 1.0])
+
+
+
+            handles, labels2 = plt.gca().get_legend_handles_labels()
+            by_label = OrderedDict(zip(labels2, handles))
             plt.legend(by_label.values(), by_label.keys(),loc='best')
             plt.savefig(str(figCount)+'.png',format='png',dpi=300)
             figCount+=1

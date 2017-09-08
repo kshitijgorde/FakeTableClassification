@@ -1,0 +1,5 @@
+            for i in range(len(fakeDf)):
+                if fakeDf[i][0] > 77636.3656547:
+                    labels.append(1)  # rich
+                else:
+                    labels.append(0)
