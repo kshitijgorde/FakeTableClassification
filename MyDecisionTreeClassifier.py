@@ -43,47 +43,51 @@ class MyClassifiers():
         dir_name = os.path.dirname(os.path.realpath(__file__))
         #predictionResult = open(dir_name+'/'+technique+'DecisionTreeResultsNoOversampling.txt','a+')
         #predictionResult.truncate()
-        path = dir_name+'/ARX/LACity/*'
+        path = dir_name+'/LACityFake/*'
         plt.grid(True)
-        figCount = 20
+        figCount = 1
         for dirName in glob.glob(path):
             plt.clf()
-            #fileName = dirName + '/scaled_fake_tabular.pickle'
+            fileName = dirName + '/scaled_fake_tabular.pickle'
             print(dirName)
-            fakeDf = pd.read_pickle(dirName)
-            print(fakeDf.columns)
+            fakeDf = pd.read_pickle(fileName)
+            #print(fakeDf.columns)
             #Generate labels.....
+           
             labels = []
             for i in range(len(fakeDf)):
-                if fakeDf['Total Payments'][i] > 77636.3656547:
+                if fakeDf[i][8] > 77636.3656547:
                     labels.append(1)  # rich
                 else:
                     labels.append(0)  # poor
 
+            
+            print(collections.Counter(labels))
             algorithms = ['DecisionTree','RandomForest','AdaBoost','MLPClassifier']
-            fakeDf.drop('Permanent Bonus Pay', axis=1, inplace=True)
+            fakeDfUpdated = np.delete(fakeDf, [0,1,2,3,4,5,6,7,8,9,11,15], axis=1)
+            # fakeDf.drop('Permanent Bonus Pay', axis=1, inplace=True)
 
-            fakeDf.drop('Other Pay (Payroll Explorer)', axis=1, inplace=True)
+            # fakeDf.drop('Other Pay (Payroll Explorer)', axis=1, inplace=True)
 
-            fakeDf.drop('Temporary Bonus Pay', axis=1, inplace=True)
+            # fakeDf.drop('Temporary Bonus Pay', axis=1, inplace=True)
 
-            fakeDf.drop('% Over Base Pay', axis=1, inplace=True)
+            # fakeDf.drop('% Over Base Pay', axis=1, inplace=True)
 
-            fakeDf.drop('Q4 Payments', axis=1, inplace=True)
+            # fakeDf.drop('Q4 Payments', axis=1, inplace=True)
 
-            fakeDf.drop('Q3 Payments', axis=1, inplace=True)
+            # fakeDf.drop('Q3 Payments', axis=1, inplace=True)
 
-            fakeDf.drop('Q2 Payments', axis=1, inplace=True)
+            # fakeDf.drop('Q2 Payments', axis=1, inplace=True)
 
-            fakeDf.drop('Q1 Payments', axis=1, inplace=True)
+            # fakeDf.drop('Q1 Payments', axis=1, inplace=True)
 
-            fakeDf.drop('Projected Annual Salary', axis=1, inplace=True)
+            # fakeDf.drop('Projected Annual Salary', axis=1, inplace=True)
 
-            fakeDf.drop('Total Payments', axis=1, inplace=True)
+            # fakeDf.drop('Total Payments', axis=1, inplace=True)
 
-            fakeDf.drop('Payments Over Base Pay', axis=1, inplace=True)
+            # fakeDf.drop('Payments Over Base Pay', axis=1, inplace=True)
 
-            fakeDf.drop('Base Pay', axis=1, inplace=True)
+            # fakeDf.drop('Base Pay', axis=1, inplace=True)
 
             # Create a dual for loop for everyalgorithm
             for eachAlgorithm in algorithms:
@@ -92,9 +96,14 @@ class MyClassifiers():
                                                1: "criterion=entropy,splitter=random,max_depth=None,min_samples_split=3,min_samples_leaf=1,max_features=None,presort=False",
                                                2: "criterion=gini,splitter=best,max_depth=None,min_samples_split=2,min_samples_leaf=1,max_features=None,presort=False",
                                                3: "criterion=entropy,splitter=random,max_depth=None,min_samples_split=4,min_samples_leaf=1,max_features=None,presort=False",
-                                               4: "criterion=gini,splitter=best,max_depth=None,min_samples_split=2,min_samples_leaf=1,max_features=None,presort=False"
+                                               4: "criterion=gini,splitter=best,max_depth=None,min_samples_split=5,min_samples_leaf=1,max_features=None,presort=True",
+                                               5: "criterion=gini,splitter=best,max_depth=None,min_samples_split=6,min_samples_leaf=1,max_features=None,presort=False",
+                                               6: "criterion=gini,splitter=best,max_depth=None,min_samples_split=7,min_samples_leaf=1,max_features=None,presort=False",
+                                               7: "criterion=gini,splitter=best,max_depth=None,min_samples_split=8,min_samples_leaf=1,max_features=None,presort=True",
+                                               8: "criterion=gini,splitter=best,max_depth=None,min_samples_split=9,min_samples_leaf=1,max_features=None,presort=False",
+                                               9: "criterion=gini,splitter=best,max_depth=None,min_samples_split=10,min_samples_leaf=1,max_features=None,presort=True"
                                                }
-                    for i in range(0,5):
+                    for i in range(0,10):
                         parameter = list(parameters_decisionTree.values())[i]
                         param = parameter.split(',')
                         my_criterion = param[0].split('=')[1]
@@ -118,7 +127,7 @@ class MyClassifiers():
                         # ----------------
                         #-----------------
 
-                        clf.fit(fakeDf,labels)
+                        clf.fit(fakeDfUpdated,labels)
                         fakeResults = clf.predict(realTest_Features)
                         fakeF1 = f1_score(realTest_Labels,fakeResults,average='macro')
                         print('Fake Results F1-measure is: '+str(fakeF1))
@@ -138,9 +147,14 @@ class MyClassifiers():
                         1: "n_estimators=80,learning_rate=1.4,algorithm=SAMME.R",
                         2: "n_estimators=100,learning_rate=1.3,algorithm=SAMME",
                         3: "n_estimators=120,learning_rate=1.6,algorithm=SAMME.R",
-                        4: "n_estimators=250,learning_rate=2.0,algorithm=SAMME"
+                        4: "n_estimators=250,learning_rate=2.0,algorithm=SAMME",
+                        5: "n_estimators=220,learning_rate=2.3,algorithm=SAMME.R",
+                        6: "n_estimators=176,learning_rate=2.2,algorithm=SAMME",
+                        7: "n_estimators=300,learning_rate=3.0,algorithm=SAMME.R",
+                        8: "n_estimators=169,learning_rate=1.2,algorithm=SAMME",
+                        9: "n_estimators=211,learning_rate=2.6,algorithm=SAMME.R"
                         }
-                    for i in range(0,5):
+                    for i in range(0,10):
                         f1score = 0
                         fakeF1 = 0
                         parameter = list(parameters_AdaBoost.values())[i]
@@ -154,7 +168,7 @@ class MyClassifiers():
                         realResult = clf.predict(realTest_Features)
                         f1score = f1_score(realTest_Labels,realResult,average='macro')
                         print("The f1_score is:" + str(f1score))
-                        clf.fit(fakeDf, labels)
+                        clf.fit(fakeDfUpdated, labels)
                         fakeResults = clf.predict(realTest_Features)
                         fakeF1 = f1_score(realTest_Labels, fakeResults, average='macro')
                         print('Fake Results F1-measure is: ' + str(fakeF1))
@@ -172,9 +186,14 @@ class MyClassifiers():
                         1: "n_estimators=20, criterion=entropy, min_samples_split=3,max_features=auto,bootstrap=False,verbose=2",
                         2: "n_estimators=30, criterion=gini, min_samples_split=2,max_features=auto,bootstrap=True,verbose=4",
                         3: "n_estimators=40, criterion=entropy, min_samples_split=4,max_features=auto,bootstrap=False,verbose=6",
-                        4: "n_estimators=50, criterion=gini, min_samples_split=5,max_features=auto,bootstrap=True,verbose=1"
+                        4: "n_estimators=50, criterion=gini, min_samples_split=5,max_features=auto,bootstrap=True,verbose=1",
+                        5: "n_estimators=60, criterion=entropy, min_samples_split=6,max_features=auto,bootstrap=False,verbose=3",
+                        6: "n_estimators=70, criterion=gini, min_samples_split=7,max_features=auto,bootstrap=True,verbose=1",
+                        7: "n_estimators=80, criterion=entropy, min_samples_split=7,max_features=auto,bootstrap=False,verbose=5",
+                        8: "n_estimators=90, criterion=gini, min_samples_split=8,max_features=auto,bootstrap=True,verbose=1",
+                        9: "n_estimators=100, criterion=entropy, min_samples_split=10,max_features=auto,bootstrap=False,verbose=7"
                         }
-                    for i in range(0,5):
+                    for i in range(0,9):
                         f1score = 0
                         fakeF1 = 0
                         parameter = list(parameters_RandomForest.values())[i]
@@ -197,7 +216,7 @@ class MyClassifiers():
                         f1score = f1_score(realTest_Labels,realResult,average='macro')
                         print("The f1_score is:" + str(f1score))
                         #fakeDfUpdated = np.delete(fakeDf, [6, 8, 9], axis=1)
-                        clf.fit(fakeDf, labels)
+                        clf.fit(fakeDfUpdated, labels)
                         fakeResults = clf.predict(realTest_Features)
                         fakeF1 = f1_score(realTest_Labels, fakeResults, average='macro')
                         print('Fake Results F1-measure is: ' + str(fakeF1))
@@ -214,9 +233,14 @@ class MyClassifiers():
                         1: "activation=identity, solver=lbfgs, learning_rate=invscaling,max_iter=300",
                         2: "activation=logistic, solver=sgd, learning_rate=adaptive,max_iter=250",
                         3: "activation=tanh, solver=adam, learning_rate=constant,max_iter=320",
-                        4: "activation=relu, solver=lbfgs, learning_rate=constant,max_iter=270"
+                        4: "activation=relu, solver=lbfgs, learning_rate=constant,max_iter=270",
+                        5: "activation=identity, solver=lbfgs, learning_rate=invscaling,max_iter=270",
+                        6: "activation=logistic, solver=lbfgs, learning_rate=constant,max_iter=350",
+                        7: "activation=tanh, solver=lbfgs, learning_rate=constant,max_iter=400",
+                        8: "activation=relu, solver=lbfgs, learning_rate=constant,max_iter=325",
+                        9: "activation=logistic, solver=sgd, learning_rate=constant,max_iter=480"
                     }
-                    for i in range(0, 5):
+                    for i in range(0,10):
                         f1score = 0
                         fakeF1 = 0
                         parameter = list(parameters_MLP.values())[i]
@@ -241,7 +265,7 @@ class MyClassifiers():
                         print('PRINTING FROM FAKE')
                         print(labels.count(0.0))
                         print(labels.count(1.0))
-                        clf.fit(fakeDf, labels)
+                        clf.fit(fakeDfUpdated, labels)
                         fakeResults = clf.predict(realTest_Features)
                         fakeF1 = f1_score(realTest_Labels, fakeResults, average='macro')
                         print('Fake Results F1-measure is: ' + str(fakeF1))
